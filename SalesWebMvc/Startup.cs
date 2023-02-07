@@ -28,16 +28,22 @@ namespace SalesWebMvc
     {
       services.Configure<CookiePolicyOptions>(options =>
       {
-              // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-              options.CheckConsentNeeded = context => true;
+        // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+        options.CheckConsentNeeded = context => true;
         options.MinimumSameSitePolicy = SameSiteMode.None;
       });
 
 
       services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
-        services.AddDbContext<SalesWebMvcContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("SalesWebMvcContext")));
+      // Set DbContext for SQLServer
+      // services.AddDbContext<SalesWebMvcContext>(options =>
+      //         options.UseSqlServer(Configuration.GetConnectionString("SalesWebMvcContext")));
+
+      // Set DbContext for MySQL
+      services.AddDbContext<SalesWebMvcContext>(options =>
+              options.UseMySql(Configuration.GetConnectionString("SalesWebMvcContext"), builder =>
+              builder.MigrationsAssembly("SalesWebMvc")));
     }
 
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
