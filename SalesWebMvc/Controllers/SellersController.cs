@@ -18,8 +18,24 @@ namespace SalesWebMvc.Controllers
 
     public IActionResult Index()
     {
-      var listSellers = _sellerService.FindAll();      
+      var listSellers = _sellerService.FindAll();
       return View(listSellers);
+    }
+
+    public IActionResult Details(int? id)
+    {
+      if (id == null)
+      {
+        return NotFound();
+      }
+      var obj = _sellerService.FindById(id.Value);
+
+      if (obj == null)
+      {
+        return NotFound();
+      }
+
+      return View(obj);
     }
 
     public IActionResult Create()
