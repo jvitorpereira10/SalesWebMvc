@@ -28,6 +28,8 @@ namespace SalesWebMvc.Services
 
     public Seller FindById(int id)
     {
+      // Using eager loading "Include" to return all objets relateds with main object.
+      // In this case, will return Department of respective Seller.
       return _context.Seller.Include(obj => obj.Department).FirstOrDefault(obj => obj.Id == id);
     }
 

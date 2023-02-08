@@ -16,6 +16,7 @@ namespace SalesWebMvc.Services
 
     public List<Department> FindAll()
     {
+      // Returns list of departments ordened by name.
       return _context.Department.OrderBy(d => d.Name).ToList();
     }
   }
