@@ -43,9 +43,40 @@ namespace SalesWebMvc.Controllers
             return View(obj);
         }
 
-        public IActionResult GroupingSearch()
+        public async Task<IActionResult> GroupingSearchByDepartment(DateTime? minDate, DateTime? maxDate)
         {
-            return View();
+            if (!minDate.HasValue)
+            {
+                minDate = new DateTime(DateTime.Now.Year, 1, 1);
+            }
+            if (!maxDate.HasValue)
+            {
+                maxDate = DateTime.Now;
+            }
+
+            ViewData["minDate"] = minDate.Value.ToString("yyyy-MM-dd");
+            ViewData["maxDate"] = maxDate.Value.ToString("yyyy-MM-dd");
+            var obj = await _salesRecordService.SearchByPeriodGroupingDepartmentAsync(minDate, maxDate);
+
+            return View(obj);
+        }
+
+        public async Task<IActionResult> GroupingSearchBySeller(DateTime? minDate, DateTime? maxDate)
+        {
+            if (!minDate.HasValue)
+            {
+                minDate = new DateTime(DateTime.Now.Year, 1, 1);
+            }
+            if (!maxDate.HasValue)
+            {
+                maxDate = DateTime.Now;
+            }
+
+            ViewData["minDate"] = minDate.Value.ToString("yyyy-MM-dd");
+            ViewData["maxDate"] = maxDate.Value.ToString("yyyy-MM-dd");
+            var obj = await _salesRecordService.SearchByPeriodGroupingSellerAsync(minDate, maxDate);
+
+            return View(obj);
         }
 
         public IActionResult Error(string message)

@@ -27,5 +27,28 @@ namespace SalesWebMvc.Services
                 .OrderByDescending(x => x.Date)
                 .ToListAsync();
         }
+        public async Task<IEnumerable<IGrouping<Department,SalesRecord>>> SearchByPeriodGroupingDepartmentAsync(DateTime? initial, DateTime? final)
+        {
+            // Returns sales records by period.
+            return await _context.SalesRecord
+                .Where(x => x.Date >= initial && x.Date <= final)
+                .Include(x => x.Seller)
+                .Include(x => x.Seller.Department)                
+                .OrderByDescending(x => x.Date)
+                .GroupBy(x => x.Seller.Department)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<IGrouping<Seller, SalesRecord>>> SearchByPeriodGroupingSellerAsync(DateTime? initial, DateTime? final)
+        {
+            // Returns sales records by period.
+            return await _context.SalesRecord
+                .Where(x => x.Date >= initial && x.Date <= final)
+                .Include(x => x.Seller)
+                .Include(x => x.Seller.Department)
+                .OrderByDescending(x => x.Date)
+                .GroupBy(x => x.Seller)
+                .ToListAsync();
+        }
     }
 }
