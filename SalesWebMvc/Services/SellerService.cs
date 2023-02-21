@@ -8,56 +8,68 @@ using System.Threading.Tasks;
 
 namespace SalesWebMvc.Services
 {
-  public class SellerService
-  {
-    private readonly SalesWebMvcContext _context;
-
-    public SellerService(SalesWebMvcContext context)
+    public class SellerService
     {
-      _context = context;
-    }
+        private readonly SalesWebMvcContext _context;
 
-    public async Task<List<Seller>> FindAllAsync()
-    {
-      return await _context.Seller.ToListAsync();
-    }
+        public SellerService(SalesWebMvcContext context)
+        {
+            _context = context;
+        }
 
-    public async Task InsertAsync(Seller obj)
-    {
-      _context.Add(obj);
-      await _context.SaveChangesAsync();
-    }
+        public async Task<List<Seller>> FindAllAsync()
+        {
+            return await _context.Seller.ToListAsync();
+        }
 
-    public async Task<Seller> FindByIdAsync(int id)
-    {
-      // Using eager loading "Include" to return all objets relateds with main object.
-      // In this case, will return Department of respective Seller.
-      return await _context.Seller.Include(obj => obj.Department).FirstOrDefaultAsync(obj => obj.Id == id);
-    }
+        public async Task InsertAsync(Seller obj)
+        {
+            _context.Add(obj);
+            await _context.SaveChangesAsync();
+        }
 
-    public async Task RemoveAsync(int id)
-    {
-      var obj = await _context.Seller.FindAsync(id);
-      _context.Seller.Remove(obj);
-      await _context.SaveChangesAsync();
-    }
+        public async Task<Seller> FindByIdAsync(int id)
+        {
+            // Using eager loading "Include" to return all objets relateds with main object.
+            // In this case, will return Department of respective Seller.
+            return await _context.Seller.Include(obj => obj.Department).FirstOrDefaultAsync(obj => obj.Id == id);
+        }
 
-    public async Task UpdateAsync(Seller seller)
-    {
-      if (!await _context.Seller.AnyAsync(obj => obj.Id == seller.Id))
-      {
-        throw new NotFoundException("Id not found.");
-      }
-      try
-      {
-        _context.Update(seller);
-        await _context.SaveChangesAsync();
-      }
-      catch (DbUpdateConcurrencyException e)
-      {
-        throw new DbConcurrencyException(e.Message);
-      }
+        public async Task RemoveAsync(int id)
+        {
+            try
+            {
+                var obj = await _context.Seller.FindAsync(id);
+                _context.Seller.Remove(obj);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateException e)
+            {
+                string messageError = e.InnerException.Message;
+                if (!string.IsNullOrEmpty(messageError) && (bool)messageError?.ToUpper()?.Contains("FK_SALESRECORD_SELLER_SELLERID"))
+                {
+                    messageError = $"Can't delete seller because he/she has sales. ";
+                }
+                throw new IntegrityException(messageError);
+            }
+        }
 
+        public async Task UpdateAsync(Seller seller)
+        {
+            if (!await _context.Seller.AnyAsync(obj => obj.Id == seller.Id))
+            {
+                throw new NotFoundException("Id not found.");
+            }
+            try
+            {
+                _context.Update(seller);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException e)
+            {
+                throw new DbConcurrencyException(e.Message);
+            }
+
+        }
     }
-  }
 }
