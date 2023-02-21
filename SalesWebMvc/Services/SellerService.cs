@@ -48,9 +48,9 @@ namespace SalesWebMvc.Services
                 string messageError = e.InnerException.Message;
                 if (!string.IsNullOrEmpty(messageError) && (bool)messageError?.ToUpper()?.Contains("FK_SALESRECORD_SELLER_SELLERID"))
                 {
-                    messageError = $"Can't delete seller because he/she has sales. ";
+                    throw new IntegrityException($"Can't delete seller because he/she has sales.");
                 }
-                throw new IntegrityException(messageError);
+                throw new IntegrityException(e.Message);
             }
         }
 
